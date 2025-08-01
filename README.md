@@ -1,4 +1,4 @@
-# Executando ferramentas manualmente
+# Rodando Prometheus / Grafana manualmente
 ## Instalação do Prometheus
 * Acessar o site oficial do Prometheus e baixar o zip que contém o executável. Nesse projeto utilizamos a versão **2.39.0**, que já vem com exporters para monitoramento de sistemas e banco de dados.
 * Extrair o zip e executar o arquivo **prometheus.exe**, que faz subir o servidor do Prometheus na **porta 9090**.
@@ -26,7 +26,7 @@ scrape_configs:
 * Extrair o zip e executar o arquivo **bin/grafana-server.exe**, que faz subir o servidor do Grafana na **porta 3000**.
 * Acessar o endereço **http://localhost:3000** no navegador, o console do Grafana deve ser exibido com sucesso. **Obs:** o usuário e senha padrão para primeiro acesso é "admin"
 
-# Executando as ferramentas com Docker
+# Rodando Prometheus / Grafana com Docker
 * Acessar o diretório **docker** e executar o comando **docker compose up**.
 * Acessar o endereço **http://localhost:9090** no navegador, o console do Prometheus deve ser exibido com sucesso.
 * Acessar o endereço **http://localhost:3000** no navegador, o console do Grafana deve ser exibido com sucesso. **Obs:** o usuário e senha padrão para primeiro acesso é "admin"
@@ -55,18 +55,34 @@ scrape_configs:
 
 # Integração Prometheus x Grafana
 * Acessar o console do **Grafana** e criar um novo **Data Source**
-* Na sua configuração, informar o **tipo** "Prometheus", a **URL** do Prometheus local (http://localhost:9090) e o **access** com a opção "Server"
-* As outras configurações (autenticação, alertas, etc) deixamos com o valor padrão
+* Na sua configuração, informar o **tipo** "Prometheus", a **URL** do Prometheus local (http://localhost:9090 caso esteja rodando manualmente ou http://prometheus:9090 caso esteja rodando via Docker) e o **access** com a opção "Server".
+* As outras configurações (autenticação, alertas, etc) deixamos com o valor padrão.
 * Rodar a aplicação **java/spring boot** na **porta 8080**. Podemos acessar as **métricas** expostas pelo Actuator/Prometheus através do endereço **http://localhost:8080/actuator/prometheus**
-* Para visualizar as métricas graficamente no Grafana, precisamos **criar um dashboard** ou **importar** um dos diversos dashboards disponibilizados pelo Grafana
-* Para esse exemplo, importaremos o **JVM Actuator Dashboard** (https://grafana.com/grafana/dashboards/9568-jvm-actuator/) utilizando a função de **importar dashboards** e configuramos ele com a **folder** General e o **Data Source** do tipo Prometheus criado no início deste tópico
-* Após isso, ao acessar o dashboard teremos diversos painéis exibindo diferentes métricas expostas pelo Actuator/Prometheus da nossa aplicação
+* Para visualizar as métricas graficamente no Grafana, precisamos **criar um dashboard** ou **importar** um dos diversos dashboards disponibilizados pelo Grafana.
+* Para esse exemplo, importaremos o **JVM Actuator Dashboard** (https://grafana.com/grafana/dashboards/9568-jvm-actuator/) utilizando a função de **importar dashboards** e configuramos ele com a **folder** General e o **Data Source** do tipo Prometheus criado no início deste tópico.
+* Após isso, ao acessar o dashboard teremos diversos painéis exibindo diferentes métricas expostas pelo Actuator/Prometheus da nossa aplicação.
 
 ![Grafana](./src/main/resources/static/grafana.jpg "Grafana")
 
 **Obs:** Como temos **acesso ao servidor** do Prometheus podemos usar o access "Server", caso contrário precisaríamos usar o access "Browser"
 
-### Referências:
+# Rodando a aplicação localmente
+* Na raiz do projeto, executar **npm clean & install** para buildar a aplicação.
+* Na raiz do projeto, executar **mvn spring-boot:run** para subir a aplicação na porta **8080**.
+* Chamadas para testar a aplicação:
+
+```
+curl --request GET \
+  --url http://localhost:8080/actuator/prometheus
+ 
+curl --request GET \
+  --url http://localhost:8080/teams 
+  
+curl --request GET \
+  --url http://localhost:8080/teamx
+```
+
+# Referências:
 https://prometheus.io/docs/prometheus/latest/installation/
 https://github.com/prometheus/prometheus/releases/download/v2.39.0/prometheus-2.39.0.windows-amd64.zip
 https://grafana.com/docs/grafana/v9.0/setup-grafana/installation/
